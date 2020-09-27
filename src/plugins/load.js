@@ -8,6 +8,7 @@ const nconf = require('nconf');
 const _ = require('lodash');
 
 const meta = require('../meta');
+const { themeNamePattern } = require('../constants');
 
 module.exports = function (Plugins) {
 	async function registerPluginAssets(pluginData, fields) {
@@ -102,8 +103,6 @@ module.exports = function (Plugins) {
 		const plugins = await Plugins.data.getActive();
 		await Promise.all(plugins.map(p => registerPluginAssets(p, fields)));
 	};
-
-	const themeNamePattern = /(@.*?\/)?nodebb-theme-.*$/;
 
 	Plugins.loadPlugin = async function (pluginPath) {
 		let pluginData;

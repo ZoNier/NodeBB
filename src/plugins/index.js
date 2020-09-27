@@ -10,6 +10,7 @@ const util = require('util');
 
 const user = require('../user');
 const posts = require('../posts');
+const { pluginNamePattern, themeNamePattern, paths } = require('../constants');
 
 var app;
 var middleware;
@@ -169,7 +170,7 @@ Plugins.list = async function (matching) {
 	if (matching === undefined) {
 		matching = true;
 	}
-	const version = require(path.join(nconf.get('base_dir'), 'package.json')).version;
+	const version = require(paths.baseDir).version;
 	const url = (nconf.get('registry') || 'https://packages.nodebb.org') + '/api/v1/plugins' + (matching !== false ? '?version=' + version : '');
 	try {
 		const body = await requestAsync(url);
@@ -181,9 +182,8 @@ Plugins.list = async function (matching) {
 };
 
 Plugins.normalise = async function (apiReturn) {
-	const themeNamePattern = /^(@.*?\/)?nodebb-theme-.*$/;
 	const pluginMap = {};
-	const dependencies = require(path.join(nconf.get('base_dir'), 'package.json')).dependencies;
+	const dependencies = require(paths.baseDir).dependencies;
 	apiReturn = Array.isArray(apiReturn) ? apiReturn : [];
 	apiReturn.forEach(function (packageData) {
 		packageData.id = packageData.name;
@@ -247,7 +247,7 @@ Plugins.normalise = async function (apiReturn) {
 	return pluginArray;
 };
 
-Plugins.nodeModulesPath = path.join(__dirname, '../../node_modules');
+Plugins.nodeModulesPath = paths.nodeModules;
 
 Plugins.showInstalled = async function () {
 	const dirs = await fs.promises.readdir(Plugins.nodeModulesPath);
@@ -274,7 +274,6 @@ Plugins.showInstalled = async function () {
 };
 
 async function findNodeBBModules(dirs) {
-	const pluginNamePattern = /^(@.*?\/)?nodebb-(theme|plugin|widget|rewards)-.*$/;
 	const pluginPaths = [];
 	await async.each(dirs, function (dirname, next) {
 		var dirPath = path.join(Plugins.nodeModulesPath, dirname);
